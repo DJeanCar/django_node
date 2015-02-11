@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Preguntas</title>
+</head>
+<body>
+	<h1>Preguntas!</h1>
+	<section>	
+	{% for question,like in questions %}
+		<p>{{ question.question }}</p>
+		<a class="pregunta" value="{{ question.id }}">Like</a><span id="{{ question.id }}"> {{like}}</span>
+	{% endfor %}
+	</section>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+	<script>
+		var socket = io.connect('http://localhost:3000');
+
+		$('.pregunta').on('click', DandoLike);
+
+		function DandoLike(){
+			datos = {
+				user : "{{ user.username }}",
+				id_pregunta : $(this).attr('value')
+			}
+			socket.emit('dando like', datos);
+		}
+
+		socket.on('devolviendo like', function(data){
+			var data = JSON.parse(data);
+			$('#'+ data.id_pregunta).text(data.cantidad_likes);
+		});
+	</script>
+</body>
+</html>
